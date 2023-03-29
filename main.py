@@ -115,24 +115,32 @@ for p in zapytanie.json()['daily']['rain_sum']:
         print('Blad')
     with open('output.txt','a') as plik:
         if True:
-            plik.write(f"Opady deszczu {p} ml,W {searched_date}\n")
+            plik.write(f"{searched_date},{p}\n")
 class WeatherForecast:
-    def __init__(self, pogoda, searched_date):
-        self.pogoda = pogoda
-        self.searched_date = searched_date
+    def __init__(self, pogoda={}):
+        if not pogoda:
+            self.pogoda = pogoda
+        else:
+            with open('output.txt ', 'r') as file:
+                self.pogoda = file.readlines()
+
+            pass
+
     def __setitem__(self, item, value):
         self.pogoda[item] = value
 
     def __float__(self):
-        return f'<opad deszczu: {self.pogoda}, w dniu: {self.searched_date}>'
+        return f'<opad deszczu: {self.pogoda}>'
     def __getitem__(self, item):
-        return self.pogoda[item]
+        if item in self.pogoda:
+            return self.pogoda[item]
+        else:
+            # requests.get(URL)
+            pass
     def __iter__(self):
-        with open('output.txt','r'):
-            if True:
-                for s in self.searched_date:
-                    yield s
+        with open('output.txt', 'r'):
+            for s in self.pogoda:
+                yield s
 
 
-for s in searched_date:
-    print(s)
+print(pogoda)
