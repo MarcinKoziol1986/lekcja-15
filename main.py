@@ -74,7 +74,11 @@ def data_istnieje_w_pliku():
 
 latitude = '52.237049'
 longitude = '21.017532'
+
 searched_date = input("Podaj Date: ")
+if not sprawdz_date(searched_date):
+    print("Nieprawidłowy format daty. Poprawny format to: RRRR-MM-DD")
+    exit()
 
 if not data_istnieje_w_pliku():
 
@@ -105,42 +109,44 @@ if not zapytanie.ok:
 pogoda = []
 time = []
 for p in zapytanie.json()['daily']['rain_sum']:
-    pogoda.append(float(p))
-    print(pogoda)
-    if p == 0.0:
-        print(f"Nie Padalo w Tym Dniu ")
-    if p > 0.0:
-        print(f"Padalo w Tym Dniu")
-    if p < 0.0:
-        print('Blad')
+    if p is not None:
+        pogoda.append(float(p))
+        if p == 0.0:
+            print(f"Nie padało w tym dniu")
+        elif p > 0.0:
+            print(f"Padło w tym dniu")
+        else:
+            print("Błąd")
+    else:
+        print("Nie ma danych dla tego dnia")
     with open('output.txt','a') as plik:
         if True:
             plik.write(f"{searched_date},{p}\n")
 class WeatherForecast:
-    def __init__(self, pogoda={}):
-        if not pogoda:
-            self.pogoda = pogoda
-        else:
-            with open('output.txt ', 'r') as file:
-                self.pogoda = file.readlines()
+    def __init__(self):
+            self.data = {}
 
-            pass
+    def __setitem__(self, date, weather):
+            self.data[date] = weather
 
-    def __setitem__(self, item, value):
-        self.pogoda[item] = value
+    def __getitem__(self, date):
+            return self.data[date]
 
-    def __float__(self):
-        return f'<opad deszczu: {self.pogoda}>'
-    def __getitem__(self, item):
-        if item in self.pogoda:
-            return self.pogoda[item]
-        else:
-            # requests.get(URL)
-            pass
     def __iter__(self):
-        with open('output.txt', 'r'):
-            for s in self.pogoda:
-                yield s
+            return iter(self.data.keys())
+
+    def items(self):
+            return self.data.items()
 
 
-print(pogoda)
+weather_forecast = WeatherForecast()
+weather_forecast['2023-04-25'] = 'deszczowo'
+weather_forecast['2023-04-26'] = 'słonecznie'
+print(weather_forecast['2023-04-25'])
+for date in weather_forecast:
+    print(date)
+print(list(weather_forecast.items()))
+
+
+
+
